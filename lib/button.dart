@@ -25,13 +25,15 @@ class ButtonCal extends StatelessWidget {
               foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
             ),
             onPressed: () {
-              if(this.text == "Cal 1"){
+              if(this.text=="Cal 1"){
                 Navigator.push(
                   context, 
-                  MaterialPageRoute(builder: (context) => const Cal1())
+                  MaterialPageRoute(builder: (context){
+                    return Cal1();
+                  })
                 );
               }else{
-                
+
               }
             },
             child: Text(text,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700)),
