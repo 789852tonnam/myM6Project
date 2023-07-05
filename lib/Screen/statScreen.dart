@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:project/Provider/rankDataProvider.dart';
 import 'package:provider/provider.dart';
 
-import '../Provider/rankData.dart';
-
 class StatScreen extends StatefulWidget {
   const StatScreen({super.key});
 
@@ -32,14 +30,7 @@ class _StatScreenState extends State<StatScreen> {
       body: Consumer(
         builder: (context, rankDataProvider provider,Widget? child) {
           provider.sortRankData();
-          List<rankData> rankDataKeyList = [];
-          List<int> rankDataValueList = [];
-          for(var i in provider.getrankData().entries){
-            rankDataKeyList.add(i.key);
-          }
-          for(var i in provider.getrankData().entries){
-            rankDataValueList.add(i.value);
-          }
+          var rankDataList = provider.getrankData().entries.toList();
 
           return ListView.builder(
             itemCount: provider.getrankData().length,
@@ -75,7 +66,7 @@ class _StatScreenState extends State<StatScreen> {
                             decoration: BoxDecoration(
                               color: Colors.green.shade300,
                             ),
-                            child: Center(child: Text(rankDataKeyList[index].name,style: TextStyle(fontSize: 20),)),
+                            child: Center(child: Text(rankDataList[index].key.name,style: TextStyle(fontSize: 20),)),
                           ),
                         )
                       ),
@@ -86,7 +77,7 @@ class _StatScreenState extends State<StatScreen> {
                           color: Colors.green.shade500,
                           borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
                         ),
-                        child: Center(child: Text("${rankDataValueList[index]}",style: TextStyle(fontSize: 20),)),
+                        child: Center(child: Text("${rankDataList[index].value}",style: TextStyle(fontSize: 20),)),
                       )
                     ],
                   )
