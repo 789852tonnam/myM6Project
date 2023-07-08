@@ -110,13 +110,13 @@ class _Cal2ScreenState extends State<Cal2Screen> {
             Center(
               child: ElevatedButton(
                 onPressed: (){
-                  String temp = "";
+                  String temp1 = "";
                   checkDataTrue = false;
                   checkDataTrue3 = false;
                   if(key3.currentState!.validate()){
                     String substance = manageSubsacnceData(_substanceController.text);
                     String _decorSubstance1 = decorSubstance1(substance);
-                    temp = _decorSubstance1;
+                    temp1 = _decorSubstance1;
                     String _decorSubstance2 = decorSubstance2(_decorSubstance1);
                     List<String> equation = makeEquation(_decorSubstance2);
                     List<String> equation2 = infixToPostfix(equation);
@@ -127,15 +127,24 @@ class _Cal2ScreenState extends State<Cal2Screen> {
                       try {
                         double temp = double.parse(_molController.text);
                         mass = numberFormat(answer * temp);
-                        volume = numberFormat(temp * 22.4);
-                        atomAmount = numberFormat(temp * 6.02214076e+23);
+                        if(!checkDataTrue) {
+                          volume = numberFormat(temp * 22.4);
+                          atomAmount = numberFormat(temp * 6.02214076e+23);
+                        }
+                        else{
+                          volume = numberFormat(0);
+                          atomAmount = numberFormat(0);
+                        }
                       } catch (e) {
                         checkDataTrue3 = true;
+                        mass = numberFormat(0);
+                        volume = numberFormat(0);
+                        atomAmount = numberFormat(0);
                       }
                     });
                     key3.currentState!.validate();
                   }
-                  if(!checkDataTrue && !checkDataTrue3) provider.addRankData(temp);
+                  if(!checkDataTrue && !checkDataTrue3) provider.addRankData(temp1);
                 },
                 child: Text("คำนวณ", style: TextStyle(fontSize: 20),)
               ),

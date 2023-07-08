@@ -40,6 +40,10 @@ String insertString(String str, int index, String insertStr){
 }
 
 String decorSubstance1(String str){
+    if(isNumber(str[0])){
+      checkDataTrue = true;
+      return "";
+    }
     for(int i = str.length-1; i >= 1; i--){
     if(i == str.length-1 && str[i] == "1"){
       if(isSuperLetter(str[i-1])){

@@ -143,15 +143,16 @@ class _Cal1ScreenState extends State<Cal1Screen> {
                       String temp = "";
                       checkDataTrue = false;
                       checkDataTrue2 = false;
+
+                      String substance = manageSubsacnceData(_substanceController.text);
+                      String _decorSubstance1 = decorSubstance1(substance);
+                      temp = _decorSubstance1;
+                      String _decorSubstance2 = decorSubstance2(_decorSubstance1);
+                      List<String> equation = makeEquation(_decorSubstance2);
+                      List<String> equation2 = infixToPostfix(equation);
+                      List<String> equation3 = elementToAtomicmass(equation2);
+                      double answer = calculate(equation3);
                       if(key.currentState!.validate()){
-                          String substance = manageSubsacnceData(_substanceController.text);
-                          String _decorSubstance1 = decorSubstance1(substance);
-                          temp = _decorSubstance1;
-                          String _decorSubstance2 = decorSubstance2(_decorSubstance1);
-                          List<String> equation = makeEquation(_decorSubstance2);
-                          List<String> equation2 = infixToPostfix(equation);
-                          List<String> equation3 = elementToAtomicmass(equation2);
-                          double answer = calculate(equation3);
                           if(valueChoose == "มวล"){
                             //มวล
                             setState(() {
@@ -163,6 +164,7 @@ class _Cal1ScreenState extends State<Cal1Screen> {
                                   result = temp / answer;
                                 } catch(e) {
                                   checkDataTrue2 = true;
+                                  result = 0;
                                 }
                               }
                             });
@@ -176,6 +178,7 @@ class _Cal1ScreenState extends State<Cal1Screen> {
                                 result = temp / 6.02214076e+23;
                               } catch(e) {
                                 checkDataTrue2 = true;
+                                result = 0;
                                 key.currentState!.validate();
                               }
                             });
@@ -188,12 +191,17 @@ class _Cal1ScreenState extends State<Cal1Screen> {
                                 result = temp / 22.4;
                               } catch(e) {
                                 checkDataTrue2 = true;
+                                result = 0;
                                 key.currentState!.validate();
                               }
 
                             });
                           }
                           if(!checkDataTrue && !checkDataTrue2) provider.addRankData(temp);
+                      }else{
+                        setState(() {
+                          result = 0;
+                        });
                       }
                     }, 
                     child: Text("คำนวณ", style: TextStyle(fontSize: 20),)
