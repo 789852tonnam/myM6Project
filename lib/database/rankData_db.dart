@@ -38,7 +38,7 @@ class rankDataDB{
     var store = intMapStoreFactory.store('rankData');
     var data = await store.record(1).get(db);
     if(data!=null){
-      for(var i in data!.entries){
+      for(var i in data.entries){
         dataMap[i.key] = int.parse(i.value.toString());
       }
     }

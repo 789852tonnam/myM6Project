@@ -110,12 +110,15 @@ class _Cal2ScreenState extends State<Cal2Screen> {
             Center(
               child: ElevatedButton(
                 onPressed: (){
+                  String temp = "";
                   checkDataTrue = false;
                   checkDataTrue3 = false;
                   if(key3.currentState!.validate()){
                     String substance = manageSubsacnceData(_substanceController.text);
-                    String _decorSubstance = decorSubstance(substance);
-                    List<String> equation = makeEquation(_decorSubstance);
+                    String _decorSubstance1 = decorSubstance1(substance);
+                    temp = _decorSubstance1;
+                    String _decorSubstance2 = decorSubstance2(_decorSubstance1);
+                    List<String> equation = makeEquation(_decorSubstance2);
                     List<String> equation2 = infixToPostfix(equation);
                     List<String> equation3 = elementToAtomicmass(equation2);
                     double answer = calculate(equation3);
@@ -132,7 +135,7 @@ class _Cal2ScreenState extends State<Cal2Screen> {
                     });
                     key3.currentState!.validate();
                   }
-                  if(!checkDataTrue && !checkDataTrue3) provider.addRankData(_substanceController.text);
+                  if(!checkDataTrue && !checkDataTrue3) provider.addRankData(temp);
                 },
                 child: Text("คำนวณ", style: TextStyle(fontSize: 20),)
               ),

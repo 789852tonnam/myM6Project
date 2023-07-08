@@ -27,6 +27,10 @@ bool isLetter(String str){
   return str.contains(new RegExp(r'[A-Z]'));
 }
 
+bool isSuperLetter(String str){
+  return str.contains(new RegExp(r'[A-Z]')) || str.contains(new RegExp(r'[a-z]')) || str.contains("(") || str.contains(")");
+}
+
 bool isNumber(String str){
   return str.contains(new RegExp(r'[0-9]'));
 }
@@ -35,7 +39,25 @@ String insertString(String str, int index, String insertStr){
   return str.substring(0, index) + insertStr + str.substring(index, str.length);
 }
 
-String decorSubstance(String str){
+String decorSubstance1(String str){
+    for(int i = str.length-1; i >= 1; i--){
+    if(i == str.length-1 && str[i] == "1"){
+      if(isSuperLetter(str[i-1])){
+        str = str.replaceRange(i, i+1, "");
+        continue;
+      }
+    }
+    if(str[i] == '1'){
+      if(isSuperLetter(str[i-1]) && isSuperLetter(str[i+1])){
+        str = str.replaceRange(i, i+1, "");
+        continue;
+      }
+    }
+  }
+  return str;
+}
+
+String decorSubstance2(String str){
   for(int i = str.length-1; i >= 1; i--){
     if(isLetter(str[i])){
       if(str[i-1] == "("){
@@ -46,7 +68,6 @@ String decorSubstance(String str){
       str = insertString(str, i, "*");
     }
   }
-
   return str;
 }
 
