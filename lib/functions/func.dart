@@ -89,8 +89,13 @@ List<String> infixToPostfix(List<String> equation){
     if(temp == "("){
       stack.add(temp);
     }else if(temp == ")"){
-      while(stack.last != "("){
-        postfix.add(stack.removeLast());
+      try{
+        while(stack.last != "("){
+          postfix.add(stack.removeLast());
+        }
+      }catch(e){
+        checkDataTrue = true;
+        return postfix;
       }
       stack.removeLast();
     }else if(temp == "+" || temp == "*"){
@@ -150,43 +155,53 @@ double calculate(List<String> equation){
 }
 
 String numberFormat(double num){
-  int m = 0;
-  while(num>10){
-    num/=10;
-    m++;
+  if(num == 0) return "0.000 x 10⁰";
+  
+  int m=0;
+  while(num>=10||num<1){
+    if(num>=10){
+      num/=10;
+      m++;
+    }else if(num<1){
+      num*=10;
+      m--;
+    }
   }
   num*=1000;
   num = num.roundToDouble();
   num/=1000;
-  String str = num.toStringAsFixed(3);
 
-  String power = m.toString();
-  String power2 = "";
-
-  for(int i=0; i<power.length; i++){
-    if(power[i] == "1"){
-      power2 += "\u00B9";
-    }else if(power[i] == "2"){
-      power2 += "\u00B2";
-    }else if(power[i] == "3"){
-      power2 += "\u00B3";
-    }else if(power[i] == "4"){
-      power2 += "\u2074";
-    }else if(power[i] == "5"){
-      power2 += "\u2075";
-    }else if(power[i] == "6"){
-      power2 += "\u2076";
-    }else if(power[i] == "7"){
-      power2 += "\u2077";
-    }else if(power[i] == "8"){
-      power2 += "\u2078";
-    }else if(power[i] == "9"){
-      power2 += "\u2079";
-    }else if(power[i] == "0"){
-      power2 += "\u2070";
+  if(num == 10){
+    num = 1;
+    m++;
+  }
+  
+  String temp = m.toString();
+  String str = "";
+  for(int i=0; i<temp.length; i++){
+    if(temp[i] == "-"){
+      str += "⁻";
+    }else if(temp[i] == "1"){
+      str += "¹";
+    }else if(temp[i] == "2"){
+      str += "²";
+    }else if(temp[i] == "3"){
+      str += "³";
+    }else if(temp[i] == "4"){
+      str += "⁴";
+    }else if(temp[i] == "5"){
+      str += "⁵";
+    }else if(temp[i] == "6"){
+      str += "⁶";
+    }else if(temp[i] == "7"){
+      str += "⁷";
+    }else if(temp[i] == "8"){
+      str += "⁸";
+    }else if(temp[i] == "9"){
+      str += "⁹";
+    }else if(temp[i] == "0"){
+      str += "⁰";
     }
   }
-
-  return str + " x 10" + power2;
+  return num.toStringAsFixed(3) + " x 10" + str;
 }
-

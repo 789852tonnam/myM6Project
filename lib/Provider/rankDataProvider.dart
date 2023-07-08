@@ -1,40 +1,44 @@
 //provider
 import 'package:flutter/material.dart';
-import 'package:project/Provider/rankData.dart';
+import 'package:project/database/rankData_db.dart';
 
 class rankDataProvider with ChangeNotifier{
-  Map<rankData, int> _rankDataMap = {
-    rankData("fire") : 4,
-    rankData("earth") : 2,
-    rankData("water") : 3,
-    rankData("air") : 1,
+  Map<String, int> _rankDataMap = {
   };
 
-  void addRankData(rankData rankData){
+  void initData () async{
+    var db = await rankDataDB(dbName: 'rankData.db');
+    db.openDatabase();
+    _rankDataMap = await db.getData();
+    notifyListeners();
+  }
+
+  void addRankData(String rankData) async {
+    var db = await rankDataDB(dbName: 'rankData.db');
+    db.openDatabase();
     if(_rankDataMap.containsKey(rankData)){
       _rankDataMap[rankData] = _rankDataMap[rankData]! + 1;
     }else{
       _rankDataMap[rankData] = 1;
     }
+    db.updateData(_rankDataMap);
+
     notifyListeners();
   }
 
-  void decreaseRankData(rankData rankData){
-    if(_rankDataMap.containsKey(rankData) && _rankDataMap[rankData]! > 0){
-      _rankDataMap[rankData] = _rankDataMap[rankData]! - 1;
-    }else if(_rankDataMap.containsKey(rankData) && _rankDataMap[rankData]! == 0){
-      _rankDataMap.remove(rankData);
-    }else{
-      return;
-    }
-    notifyListeners();
+  void loadRankData() async{
+    var db = await rankDataDB(dbName: 'rankData.db');
+    db.openDatabase();
+    _rankDataMap = await db.getData();
+    _rankDataMap = Map.fromEntries(_rankDataMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
   }
 
-  Map<rankData, int> getrankData(){
+  Map<String, int> getData(){
+    this.sortRankData();
     return _rankDataMap;
   }
 
-  void sortRankData(){
+  void sortRankData() async{
     _rankDataMap = Map.fromEntries(_rankDataMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
   }
 }

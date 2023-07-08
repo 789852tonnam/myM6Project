@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:project/Provider/rankDataProvider.dart';
 import 'package:project/functions/func.dart';
 import 'package:project/Screen/cal1Screen.dart';
+import 'package:provider/provider.dart';
 
 bool checkDataTrue3 = false;
 
@@ -15,9 +17,9 @@ class _Cal2ScreenState extends State<Cal2Screen> {
   final _substanceController = TextEditingController();
   final _molController = TextEditingController();
 
-  String mass = numberFormat(0);
-  String volume = numberFormat(0);
-  String atomAmount = numberFormat(0);
+  String mass = "0";
+  String volume = "0";
+  String atomAmount = "0";
 
   final key3 = GlobalKey<FormState>();
 
@@ -27,7 +29,9 @@ class _Cal2ScreenState extends State<Cal2Screen> {
       appBar: AppBar(
         title: Text("Cal 2"),
       ),
-      body: Form(
+      body: Consumer(
+        builder: (context, rankDataProvider provider,Widget? child) {
+          return Form(
         key: key3,
         child: ListView(
           children: [
@@ -128,6 +132,7 @@ class _Cal2ScreenState extends State<Cal2Screen> {
                     });
                     key3.currentState!.validate();
                   }
+                  if(!checkDataTrue && !checkDataTrue3) provider.addRankData(_substanceController.text);
                 },
                 child: Text("คำนวณ", style: TextStyle(fontSize: 20),)
               ),
@@ -195,6 +200,8 @@ class _Cal2ScreenState extends State<Cal2Screen> {
             )
           ]
         ),
+      );
+        },
       ),
       //home button
       bottomNavigationBar: Padding(

@@ -11,6 +11,13 @@ class StatScreen extends StatefulWidget {
 
 class _StatScreenState extends State<StatScreen> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<rankDataProvider>(context, listen: false).initData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -27,13 +34,12 @@ class _StatScreenState extends State<StatScreen> {
         ),
       ),
       //listview builder
-      body: Consumer(
+      body: Consumer (
         builder: (context, rankDataProvider provider,Widget? child) {
-          provider.sortRankData();
-          var rankDataList = provider.getrankData().entries.toList();
+          List<MapEntry<String, int>> rankDataList = provider.getData().entries.toList();
 
           return ListView.builder(
-            itemCount: provider.getrankData().length,
+            itemCount: rankDataList.length,
             itemBuilder: (context, index,) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
@@ -66,7 +72,7 @@ class _StatScreenState extends State<StatScreen> {
                             decoration: BoxDecoration(
                               color: Colors.green.shade300,
                             ),
-                            child: Center(child: Text(rankDataList[index].key.name,style: TextStyle(fontSize: 20),)),
+                            child: Center(child: Text(rankDataList[index].key,style: TextStyle(fontSize: 20),)),
                           ),
                         )
                       ),

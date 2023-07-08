@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project/Provider/rankDataProvider.dart';
 import 'package:project/functions/func.dart';
+import 'package:provider/provider.dart';
 
 //global
 bool checkDataTrue = false;
@@ -31,205 +33,210 @@ class _Cal1ScreenState extends State<Cal1Screen> {
       appBar: AppBar(
         title: Text("Cal 1"),
       ),
-      body: Form(
-        key: key,
-        child: ListView(
-          children: [
-            //สารธาตุ
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade300,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
+      body: Consumer(
+        builder: (context, rankDataProvider provider,Widget? child) {
+          return Form(
+            key: key,
+            child: ListView(
+              children: [
+                //สารธาตุ
+                  Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    child: Row(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        child: Row(
+                          children: [
+                            Text("สาร/ธาตุ : ", style: TextStyle(fontSize: 20,),),
+                              Expanded(
+                                  child: TextFormField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'กรอกสาร/ธาตุ',
+                                    ),
+                                    validator: (value){
+                                      if(value == null || value.isEmpty){
+                                        return "กรุณากรอกสาร/ธาตุ";
+                                      }
+                                      if(checkDataTrue){
+                                        return "กรุณากรอกสาร/ธาตุ ให้ถูกต้อง";
+                                      }
+                                      return null;
+                                    },
+                                    controller: _substanceController,
+                                  ),
+                              ), 
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                //dropdown
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: Container(
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
                       children: [
-                        Text("สาร/ธาตุ : ", style: TextStyle(fontSize: 20,),),
-                          Expanded(
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'กรอกสาร/ธาตุ',
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(10,10,0,10),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                validator: (value){
-                                  if(value == null || value.isEmpty){
-                                    return "กรุณากรอกสาร/ธาตุ";
-                                  }
-                                  if(checkDataTrue){
-                                    return "กรุณากรอกสาร/ธาตุ ให้ถูกต้อง";
-                                  }
-                                  return null;
-                                },
-                                controller: _substanceController,
+                                child: DropdownButton(
+                                  value: valueChoose,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      valueChoose = newValue!;
+                                    });
+                                  },
+                                  items: _dropDownMenuItems.map((valueItem) {
+                                    return DropdownMenuItem(
+                                      value: valueItem,
+                                      child: Text(valueItem, style: TextStyle(fontSize: 20,),),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
-                          ), 
+                            ),
+                            Expanded(child: SizedBox())
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: TextFormField(
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: textFieldBoxText(valueChoose),
+                                  ),
+                                  validator: (value){
+                                    if(value == null || value.isEmpty){
+                                      return "กรุณากรอกข้อมูล";
+                                    }else if(checkDataTrue2){
+                                      return "กรุณากรอกข้อมูลให้ถูกต้อง";
+                                    }
+                                    return null;
+                                  },
+                                  controller: _data2Controller,
+                                ),
+                          ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            //dropdown
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Container(
-                height: 160,
-                decoration: BoxDecoration(
-                  color: Colors.green.shade300,
-                  borderRadius: BorderRadius.circular(10),
+                //button
+                Center(
+                  child: ElevatedButton(
+                    onPressed: (){
+                      checkDataTrue = false;
+                      checkDataTrue2 = false;
+                      if(key.currentState!.validate()){
+                          String substance = manageSubsacnceData(_substanceController.text);
+                          String _decorSubstance = decorSubstance(substance);
+                          List<String> equation = makeEquation(_decorSubstance);
+                          List<String> equation2 = infixToPostfix(equation);
+                          List<String> equation3 = elementToAtomicmass(equation2);
+                          double answer = calculate(equation3);
+                          if(valueChoose == "มวล"){
+                            //มวล
+                            setState(() {
+                              if(answer == 0){
+                                result = 0;
+                              }else{
+                                try{
+                                  double temp = double.parse(_data2Controller.text);
+                                  result = temp / answer;
+                                } catch(e) {
+                                  checkDataTrue2 = true;
+                                }
+                              }
+                            });
+                            key.currentState!.validate();
+                          }
+                          else if(valueChoose == "จำนวนอะตอมหรือโมเลกุล"){
+                            //จำนวนอะตอมหรือโมเลกุล
+                            setState(() {    
+                              try{
+                                double temp = double.parse(_data2Controller.text);
+                                result = temp / 6.02214076e+23;
+                              } catch(e) {
+                                checkDataTrue2 = true;
+                                key.currentState!.validate();
+                              }
+                            });
+                          }
+                          else {
+                            //ปริมาตรที่ STP
+                            setState(() {
+                              try{
+                                double temp = double.parse(_data2Controller.text);
+                                result = temp / 22.4;
+                              } catch(e) {
+                                checkDataTrue2 = true;
+                                key.currentState!.validate();
+                              }
+
+                            });
+                          }
+                          if(!checkDataTrue && !checkDataTrue2) provider.addRankData(_substanceController.text);
+                      }
+                    }, 
+                    child: Text("คำนวณ", style: TextStyle(fontSize: 20),)
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    Row(
+                //result
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: Container(
+                    alignment: Alignment.topLeft,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10,10,0,10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: DropdownButton(
-                              value: valueChoose,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  valueChoose = newValue!;
-                                });
-                              },
-                              items: _dropDownMenuItems.map((valueItem) {
-                                return DropdownMenuItem(
-                                  value: valueItem,
-                                  child: Text(valueItem, style: TextStyle(fontSize: 20,),),
-                                );
-                              }).toList(),
-                            ),
+                          SizedBox(height: 10,),
+                          Row(
+                            children: [
+                              SizedBox(width: 10,),
+                              Text("ผลลัพท์ :", style: TextStyle(fontSize: 20)),
+                              Expanded(child: SizedBox())
+                            ],
                           ),
-                        ),
-                        Expanded(child: SizedBox())
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            child: Container(
+                              height: 40,
+                              alignment: Alignment.center,  
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(numberFormat(result) + " mols", style: TextStyle(fontSize: 20))
+                            ),
+                          )
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TextFormField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: textFieldBoxText(valueChoose),
-                              ),
-                              validator: (value){
-                                if(value == null || value.isEmpty){
-                                  return "กรุณากรอกข้อมูล";
-                                }else if(checkDataTrue2){
-                                  return "กรุณากรอกข้อมูลให้ถูกต้อง";
-                                }
-                                return null;
-                              },
-                              controller: _data2Controller,
-                            ),
-                      ),
-                  ],
-                ),
-              ),
+                  ),
+                )
+              ]
             ),
-            //button
-            Center(
-              child: ElevatedButton(
-                onPressed: (){
-                  checkDataTrue = false;
-                  checkDataTrue2 = false;
-                  if(key.currentState!.validate()){
-                      if(valueChoose == "มวล"){
-                        //มวล
-                        String substance = manageSubsacnceData(_substanceController.text);
-                        String _decorSubstance = decorSubstance(substance);
-                        List<String> equation = makeEquation(_decorSubstance);
-                        List<String> equation2 = infixToPostfix(equation);
-                        List<String> equation3 = elementToAtomicmass(equation2);
-                        double answer = calculate(equation3);
-      
-                        setState(() {
-                          if(answer == 0){
-                            result = 0;
-                          }else{
-                            try{
-                              double temp = double.parse(_data2Controller.text);
-                              result = temp / answer;
-                            } catch(e) {
-                              checkDataTrue2 = true;
-                            }
-                          }
-                        });
-                        key.currentState!.validate();
-                      }
-                      else if(valueChoose == "จำนวนอะตอมหรือโมเลกุล"){
-                        //จำนวนอะตอมหรือโมเลกุล
-                        setState(() {    
-                          try{
-                            double temp = double.parse(_data2Controller.text);
-                            result = temp / 6.02214076e+23;
-                          } catch(e) {
-                            checkDataTrue2 = true;
-                            key.currentState!.validate();
-                          }
-                        });
-                      }
-                      else{
-                        //ปริมาตรที่ STP
-                        setState(() {
-                          try{
-                            double temp = double.parse(_data2Controller.text);
-                            result = temp / 22.4;
-                          } catch(e) {
-                            checkDataTrue2 = true;
-                            key.currentState!.validate();
-                          }
-                        });
-                      }
-                  }
-                }, 
-                child: Text("คำนวณ", style: TextStyle(fontSize: 20),)
-              ),
-            ),
-            //result
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Container(
-                alignment: Alignment.topLeft,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.green.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                      SizedBox(height: 10,),
-                      Row(
-                        children: [
-                          SizedBox(width: 10,),
-                          Text("ผลลัพท์ :", style: TextStyle(fontSize: 20)),
-                          Expanded(child: SizedBox())
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        child: Container(
-                          height: 40,
-                          alignment: Alignment.center,  
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(numberFormat(result)+ " mols", style: TextStyle(fontSize: 20))
-                        ),
-                      )
-                  ],
-                ),
-              ),
-            )
-          ]
-        ),
+          );
+        },
       ),
       //home button
       bottomNavigationBar: Padding(
